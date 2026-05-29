@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DriverArus - Pendapatan & Bensin ShopeeFood</title>
+    <title>DriverArus Pro - ShopeeFood Log v2</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
@@ -15,67 +16,80 @@
     </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-5xl mx-auto">
         
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl gap-4">
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="bg-orange-500 text-white text-xs font-black px-2 py-1 rounded">SHOPEEFOOD</span>
-                    <h1 class="text-xl font-bold text-orange-400">DriverArus Log</h1>
+                    <span class="bg-orange-500 text-white text-xs font-black px-2 py-1 rounded">SHOPEEFOOD PRO</span>
+                    <h1 class="text-xl font-bold text-orange-400">DriverArus Log v2</h1>
                 </div>
-                <p class="text-xs text-slate-400 mt-1">Pantau bersih pendapatan, bensin, dan target harianmu</p>
+                <p class="text-xs text-slate-400 mt-1">Manajemen tanggal, analisis operasional, dan grafik performa</p>
             </div>
             <div class="text-left md:text-right w-full md:w-auto bg-slate-900/50 p-4 rounded-xl border border-slate-700/50">
-                <p class="text-xs text-slate-400">Sisa Kantong (Pendapatan Bersih)</p>
+                <p class="text-xs text-slate-400">Total Sisa Kantong (Bersih)</p>
                 <h2 id="total-balance" class="text-2xl font-black text-orange-400">Rp 0</h2>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 flex justify-between items-center shadow-lg">
-                <div>
-                    <p class="text-xs text-slate-400 font-medium">Total Ongkir + Tip</p>
-                    <h3 id="total-income" class="text-xl font-bold text-emerald-400 mt-1">Rp 0</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="lg:col-span-1 flex flex-col gap-4">
+                <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 flex justify-between items-center shadow-lg flex-1">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Total Pendapatan</p>
+                        <h3 id="total-income" class="text-lg font-bold text-emerald-400 mt-1">Rp 0</h3>
+                    </div>
+                    <div class="bg-emerald-500/10 p-3 rounded-xl text-emerald-400 text-lg">💰</div>
                 </div>
-                <div class="bg-emerald-500/10 p-3 rounded-xl text-emerald-400 text-lg font-bold">💰</div>
+                <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 flex justify-between items-center shadow-lg flex-1">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Total Pengeluaran</p>
+                        <h3 id="total-expense" class="text-lg font-bold text-rose-400 mt-1">Rp 0</h3>
+                    </div>
+                    <div class="bg-rose-500/10 p-3 rounded-xl text-rose-400 text-lg">⛽</div>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 flex justify-between items-center shadow-lg flex-1">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Total Trip Sukses</p>
+                        <h3 id="total-orders" class="text-lg font-bold text-blue-400 mt-1">0 Order</h3>
+                    </div>
+                    <div class="bg-blue-500/10 p-3 rounded-xl text-blue-400 text-lg">🛵</div>
+                </div>
             </div>
-            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 flex justify-between items-center shadow-lg">
-                <div>
-                    <p class="text-xs text-slate-400 font-medium">Bensin & Uang Makan</p>
-                    <h3 id="total-expense" class="text-xl font-bold text-rose-400 mt-1">Rp 0</h3>
+
+            <div class="lg:col-span-2 bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl min-h-[220px] flex flex-col justify-between">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Grafik Perbandingan Arus Kas</h3>
+                <div class="relative w-full flex-1 max-h-[160px] flex justify-center">
+                    <canvas id="financeChart"></canvas>
                 </div>
-                <div class="bg-rose-500/10 p-3 rounded-xl text-rose-400 text-lg font-bold">⛽</div>
-            </div>
-            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 flex justify-between items-center shadow-lg">
-                <div>
-                    <p class="text-xs text-slate-400 font-medium">Total Orderan (Trip)</p>
-                    <h3 id="total-orders" class="text-xl font-bold text-blue-400 mt-1">0 Order</h3>
-                </div>
-                <div class="bg-blue-500/10 p-3 rounded-xl text-blue-400 text-lg font-bold">🛵</div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-1 bg-slate-800 p-6 rounded-2xl border border-slate-700 h-fit shadow-xl">
-                <h3 class="text-md font-bold mb-4 text-slate-200 border-b border-slate-700 pb-2">Input Hasil Tarikan</h3>
+                <h3 class="text-md font-bold mb-4 text-slate-200 border-b border-slate-700 pb-2">Input Log Tarikan</h3>
                 <form id="driver-form" onsubmit="addDriverTx(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Tanggal & Waktu</label>
+                        <input type="datetime-local" id="tx-date" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:border-orange-500 transition text-slate-200">
+                    </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Jenis Catatan</label>
                         <select id="tx-type" onchange="toggleCategoryOptions()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:border-orange-500 transition">
-                            <option value="income">Pendapatan (Ongkir/Tip/Bonus)</option>
-                            <option value="expense">Pengeluaran (Bensin/Makan/Ban)</option>
+                            <option value="income">Pendapatan (Uang Masuk)</option>
+                            <option value="expense">Pengeluaran (Operasional)</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Keterangan / Lokasi</label>
-                        <input type="text" id="tx-desc" required placeholder="Contoh: Orderan Bakso Wonosari" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:border-orange-500 transition">
+                        <input type="text" id="tx-desc" required placeholder="Contoh: Resto McD, Isi Pertalite Full" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:border-orange-500 transition">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Nominal Rupiah (Rp)</label>
-                        <input type="number" id="tx-amount" required placeholder="Masukkan jumlah uang" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:border-orange-500 transition">
+                        <input type="number" id="tx-amount" required placeholder="Masukkan jumlah nominal" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:border-orange-500 transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Kategori Spesifik</label>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Kategori Detail</label>
                         <select id="tx-category" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:border-orange-500 transition">
                             </select>
                     </div>
@@ -86,26 +100,28 @@
             </div>
 
             <div class="lg:col-span-2 space-y-4">
-                <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 flex flex-wrap justify-between items-center gap-2 shadow-md">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-slate-400 font-medium">Filter:</span>
-                        <select id="filter-type" onchange="render()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs focus:outline-none">
-                            <option value="all">Semua Riwayat</option>
+                <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 flex flex-wrap justify-between items-center gap-4 shadow-md">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs text-slate-400 font-medium">Bulan:</span>
+                        <input type="month" id="filter-month" onchange="render()" class="bg-slate-900 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-slate-200 focus:outline-none">
+                        
+                        <span class="text-xs text-slate-400 font-medium ml-2">Jenis:</span>
+                        <select id="filter-type" onchange="render()" class="bg-slate-900 border border-slate-700 rounded-xl px-2 py-1.5 text-xs focus:outline-none">
+                            <option value="all">Semua</option>
                             <option value="income">Hanya Pendapatan</option>
                             <option value="expense">Hanya Pengeluaran</option>
                         </select>
                     </div>
                     <button onclick="clearAllData()" class="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs px-3 py-1.5 rounded-xl font-bold transition cursor-pointer">
-                        Reset Data Hari Ini
+                        Reset Semua Log
                     </button>
                 </div>
 
                 <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl overflow-hidden">
-                    <div class="p-4 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
-                        <h3 class="text-sm font-bold text-slate-300">Log Jalan Driver</h3>
-                        <span class="text-xs text-slate-500">Otomatis Tersimpan di HP</span>
+                    <div class="p-4 border-b border-slate-700 bg-slate-800/50">
+                        <h3 class="text-sm font-bold text-slate-300">Log Mengaspal</h3>
                     </div>
-                    <div id="tx-list" class="divide-y divide-slate-700 max-h-[420px] overflow-y-auto">
+                    <div id="tx-list" class="divide-y divide-slate-700 max-h-[440px] overflow-y-auto">
                         </div>
                 </div>
             </div>
@@ -113,12 +129,25 @@
     </div>
 
     <script>
-        let driverData = JSON.parse(localStorage.getItem('shopeefood_log')) || [];
+        let driverData = JSON.parse(localStorage.getItem('shopeefood_pro_log')) || [];
+        let financeChart = null;
 
         const catOptions = {
             income: ["Argo Ongkir", "Tip Konsumen", "Bonus Insentif", "Lain-lain"],
-            expense: ["Bensin", "Uang Makan", "Parkir", "Tambal Ban / Servis", "Lain-lain"]
+            expense: ["Bensin / Pertalite", "Uang Makan", "Parkir Resto/Mall", "Tambal Ban", "Oli / Servis Motor", "Atribut / Pulsa Kuota", "Lain-lain"]
         };
+
+        // Set default datetime ke waktu sekarang waktu lokal HP
+        function setDefaultDateTime() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('tx-date').value = now.toISOString().slice(0, 16);
+            
+            // Set default filter bulan ke bulan sekarang
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            document.getElementById('filter-month').value = `${year}-${month}`;
+        }
 
         function toggleCategoryOptions() {
             const type = document.getElementById('tx-type').value;
@@ -132,105 +161,159 @@
 
         function addDriverTx(e) {
             e.preventDefault();
+            const dateVal = document.getElementById('tx-date').value;
             const type = document.getElementById('tx-type').value;
             const desc = document.getElementById('tx-desc').value.trim();
             const amount = parseFloat(document.getElementById('tx-amount').value);
             const category = document.getElementById('tx-category').value;
 
-            if(!desc || isNaN(amount) || amount <= 0) return;
+            if(!dateVal || !desc || isNaN(amount) || amount <= 0) return;
 
             const logEntry = {
                 id: Date.now(),
+                date: dateVal, // format: YYYY-MM-DDTHH:MM
                 type,
                 desc,
                 amount,
-                category,
-                date: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                category
             };
 
             driverData.unshift(logEntry);
-            localStorage.setItem('shopeefood_log', JSON.stringify(driverData));
+            localStorage.setItem('shopeefood_pro_log', JSON.stringify(driverData));
             render();
             
             document.getElementById('tx-desc').value = '';
             document.getElementById('tx-amount').value = '';
+            setDefaultDateTime();
         }
 
         function deleteLog(id) {
             driverData = driverData.filter(d => d.id !== id);
-            localStorage.setItem('shopeefood_log', JSON.stringify(driverData));
+            localStorage.setItem('shopeefood_pro_log', JSON.stringify(driverData));
             render();
         }
 
         function clearAllData() {
-            if(confirm('Hapus seluruh catatan driver hari ini?')) {
+            if(confirm('Hapus seluruh riwayat data driver?')) {
                 driverData = [];
-                localStorage.setItem('shopeefood_log', JSON.stringify(driverData));
+                localStorage.setItem('shopeefood_pro_log', JSON.stringify(driverData));
                 render();
             }
         }
 
-        function render() {
-            const listContainer = document.getElementById('tx-list');
-            const filterValue = document.getElementById('filter-type').value;
-
-            let filtered = driverData;
-            if(filterValue !== 'all') {
-                filtered = driverData.filter(d => d.type === filterValue);
+        // Inisialisasi atau Update Grafik Chart.js
+        function updateChart(income, expense) {
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            
+            if (financeChart) {
+                financeChart.destroy(); // Hancurkan chart lama biar tidak tumpang tindih
             }
 
+            financeChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Pendapatan Kotor', 'Total Operasional'],
+                    datasets: [{
+                        data: [income, expense],
+                        backgroundColor: ['#34d399', '#f87171'],
+                        borderRadius: 8,
+                        barThickness: 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8', callback: value => 'Rp ' + value.toLocaleString('id-ID') }
+                        },
+                        x: { ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        }
+
+        function render() {
+            const listContainer = document.getElementById('tx-list');
+            const filterTypeValue = document.getElementById('filter-type').value;
+            const filterMonthValue = document.getElementById('filter-month').value; // format: YYYY-MM
+
+            // 1. Filter Data berdasarkan Bulan & Jenis Catatan
+            let filtered = driverData.filter(d => {
+                const itemYearMonth = d.date.slice(0, 7); // ambil data YYYY-MM
+                const matchMonth = filterMonthValue ? (itemYearMonth === filterMonthValue) : true;
+                const matchType = filterTypeValue === 'all' ? true : d.type === filterTypeValue;
+                return matchMonth && matchType;
+            });
+
+            // 2. Hitung Akumulasi Angka khusus untuk Bulan yang sedang difilter
             let incTotal = 0;
             let expTotal = 0;
             let orderCount = 0;
 
+            // Hitung ringkasan berdasarkan data yang ter-filter bulan aktif
             driverData.forEach(d => {
-                if(d.type === 'income') {
-                    incTotal += d.amount;
-                    if(d.category === "Argo Ongkir") orderCount++; 
-                } else {
-                    expTotal += d.amount;
+                const itemYearMonth = d.date.slice(0, 7);
+                if (!filterMonthValue || itemYearMonth === filterMonthValue) {
+                    if(d.type === 'income') {
+                        incTotal += d.amount;
+                        if(d.category === "Argo Ongkir") orderCount++; 
+                    } else {
+                        expTotal += d.amount;
+                    }
                 }
             });
 
             const netProfit = incTotal - expTotal;
 
+            // 3. Tampilkan ke UI Ringkasan Atas
             document.getElementById('total-income').innerText = formatRupiah(incTotal);
             document.getElementById('total-expense').innerText = formatRupiah(expTotal);
             document.getElementById('total-orders').innerText = orderCount + ' Order';
             
             const balanceEl = document.getElementById('total-balance');
             balanceEl.innerText = formatRupiah(netProfit);
-            
-            if(netProfit < 0) {
-                balanceEl.className = "text-2xl font-black text-rose-400";
-            } else {
-                balanceEl.className = "text-2xl font-black text-orange-400";
-            }
+            balanceEl.className = netProfit < 0 ? "text-2xl font-black text-rose-400" : "text-2xl font-black text-orange-400";
 
+            // Update Grafik Interaktif
+            updateChart(incTotal, expTotal);
+
+            // 4. Render Daftar List Riwayat
             if(filtered.length === 0) {
-                listContainer.innerHTML = `<div class="p-8 text-center text-sm text-slate-500">Belum ada log tarikan hari ini. Tetap semangat, salam satu aspal!</div>`;
+                listContainer.innerHTML = `<div class="p-8 text-center text-sm text-slate-500">Tidak ada data log di bulan/kategori ini. Tetap semangat mengaspal!</div>`;
                 return;
             }
 
-            listContainer.innerHTML = filtered.map(d => `
-                <div class="p-4 flex justify-between items-center hover:bg-slate-700/30 transition">
-                    <div class="space-y-1">
-                        <div class="text-sm font-semibold text-slate-200">${d.desc}</div>
-                        <div class="flex items-center gap-2 text-xs text-slate-400">
-                            <span class="bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-orange-400 font-medium">${d.category}</span>
-                            <span>Jam ${d.date}</span>
+            listContainer.innerHTML = filtered.map(d => {
+                // Rapikan tampilan tanggal & jam dari format HTML5 datetime-local
+                const dateObj = new Date(d.date);
+                const tglFormat = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+                const jamFormat = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+                return `
+                    <div class="p-4 flex justify-between items-center hover:bg-slate-700/30 transition">
+                        <div class="space-y-1">
+                            <div class="text-sm font-semibold text-slate-200">${d.desc}</div>
+                            <div class="flex items-center gap-2 flex-wrap text-[11px] text-slate-400">
+                                <span class="bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-orange-400 font-medium">${d.category}</span>
+                                <span>${tglFormat} - ${jamFormat}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm font-bold ${d.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}">
+                                ${d.type === 'income' ? '+' : '-'} ${formatRupiah(d.amount)}
+                            </span>
+                            <button onclick="deleteLog(${d.id})" class="text-xs text-slate-500 hover:text-rose-400 p-1 font-bold cursor-pointer transition">✕</button>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm font-bold ${d.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}">
-                            ${d.type === 'income' ? '+' : '-'} ${formatRupiah(d.amount)}
-                        </span>
-                        <button onclick="deleteLog(${d.id})" class="text-xs text-slate-500 hover:text-rose-400 p-1 font-bold cursor-pointer transition">✕</button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
+        // Jalankan fungsi setup bawaan pertama kali
+        setDefaultDateTime();
         toggleCategoryOptions();
         render();
     </script>
